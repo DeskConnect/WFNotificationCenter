@@ -1,0 +1,382 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		D05BCDD71AAD77EC0079C258 /* libWFNotificationCenter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D05BCDCB1AAD77EC0079C258 /* libWFNotificationCenter.a */; };
+		D05BCDE71AAD78200079C258 /* WFDistributedNotificationCenter.m in Sources */ = {isa = PBXBuildFile; fileRef = D05BCDE61AAD78200079C258 /* WFDistributedNotificationCenter.m */; };
+		D05BCDEA1AAD78BB0079C258 /* fishhook.c in Sources */ = {isa = PBXBuildFile; fileRef = D05BCDE81AAD78BB0079C258 /* fishhook.c */; };
+		D05BCDEF1AAD7A300079C258 /* WFNotificationCenterTests.m in Sources */ = {isa = PBXBuildFile; fileRef = D05BCDEE1AAD7A300079C258 /* WFNotificationCenterTests.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		D05BCDD81AAD77EC0079C258 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D05BCDC31AAD77EC0079C258 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D05BCDCA1AAD77EC0079C258;
+			remoteInfo = WFNotificationCenter;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		D05BCDC91AAD77EC0079C258 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		D05BCDCB1AAD77EC0079C258 /* libWFNotificationCenter.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libWFNotificationCenter.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		D05BCDD61AAD77EC0079C258 /* WFNotificationCenterTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WFNotificationCenterTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D05BCDDC1AAD77EC0079C258 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D05BCDE51AAD78200079C258 /* WFDistributedNotificationCenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WFDistributedNotificationCenter.h; sourceTree = "<group>"; };
+		D05BCDE61AAD78200079C258 /* WFDistributedNotificationCenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WFDistributedNotificationCenter.m; sourceTree = "<group>"; };
+		D05BCDE81AAD78BB0079C258 /* fishhook.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = fishhook.c; path = WFNotificationCenter/fishhook/fishhook.c; sourceTree = SOURCE_ROOT; };
+		D05BCDE91AAD78BB0079C258 /* fishhook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fishhook.h; path = WFNotificationCenter/fishhook/fishhook.h; sourceTree = SOURCE_ROOT; };
+		D05BCDEE1AAD7A300079C258 /* WFNotificationCenterTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WFNotificationCenterTests.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D05BCDC81AAD77EC0079C258 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D05BCDD31AAD77EC0079C258 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D05BCDD71AAD77EC0079C258 /* libWFNotificationCenter.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D05BCDC21AAD77EC0079C258 = {
+			isa = PBXGroup;
+			children = (
+				D05BCDCD1AAD77EC0079C258 /* WFNotificationCenter */,
+				D05BCDDA1AAD77EC0079C258 /* WFNotificationCenterTests */,
+				D05BCDCC1AAD77EC0079C258 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D05BCDCC1AAD77EC0079C258 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D05BCDCB1AAD77EC0079C258 /* libWFNotificationCenter.a */,
+				D05BCDD61AAD77EC0079C258 /* WFNotificationCenterTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D05BCDCD1AAD77EC0079C258 /* WFNotificationCenter */ = {
+			isa = PBXGroup;
+			children = (
+				D05BCDE51AAD78200079C258 /* WFDistributedNotificationCenter.h */,
+				D05BCDE61AAD78200079C258 /* WFDistributedNotificationCenter.m */,
+			);
+			path = WFNotificationCenter;
+			sourceTree = "<group>";
+		};
+		D05BCDDA1AAD77EC0079C258 /* WFNotificationCenterTests */ = {
+			isa = PBXGroup;
+			children = (
+				D05BCDEE1AAD7A300079C258 /* WFNotificationCenterTests.m */,
+				D05BCDEB1AAD78C40079C258 /* fishhook */,
+				D05BCDDB1AAD77EC0079C258 /* Supporting Files */,
+			);
+			path = WFNotificationCenterTests;
+			sourceTree = "<group>";
+		};
+		D05BCDDB1AAD77EC0079C258 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				D05BCDDC1AAD77EC0079C258 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		D05BCDEB1AAD78C40079C258 /* fishhook */ = {
+			isa = PBXGroup;
+			children = (
+				D05BCDE91AAD78BB0079C258 /* fishhook.h */,
+				D05BCDE81AAD78BB0079C258 /* fishhook.c */,
+			);
+			name = fishhook;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		D05BCDCA1AAD77EC0079C258 /* WFNotificationCenter */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D05BCDDF1AAD77EC0079C258 /* Build configuration list for PBXNativeTarget "WFNotificationCenter" */;
+			buildPhases = (
+				D05BCDC71AAD77EC0079C258 /* Sources */,
+				D05BCDC81AAD77EC0079C258 /* Frameworks */,
+				D05BCDC91AAD77EC0079C258 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = WFNotificationCenter;
+			productName = WFNotificationCenter;
+			productReference = D05BCDCB1AAD77EC0079C258 /* libWFNotificationCenter.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		D05BCDD51AAD77EC0079C258 /* WFNotificationCenterTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D05BCDE21AAD77EC0079C258 /* Build configuration list for PBXNativeTarget "WFNotificationCenterTests" */;
+			buildPhases = (
+				D05BCDD21AAD77EC0079C258 /* Sources */,
+				D05BCDD31AAD77EC0079C258 /* Frameworks */,
+				D05BCDD41AAD77EC0079C258 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D05BCDD91AAD77EC0079C258 /* PBXTargetDependency */,
+			);
+			name = WFNotificationCenterTests;
+			productName = WFNotificationCenterTests;
+			productReference = D05BCDD61AAD77EC0079C258 /* WFNotificationCenterTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D05BCDC31AAD77EC0079C258 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0630;
+				ORGANIZATIONNAME = "DeskConnect, Inc.";
+				TargetAttributes = {
+					D05BCDCA1AAD77EC0079C258 = {
+						CreatedOnToolsVersion = 6.3;
+					};
+					D05BCDD51AAD77EC0079C258 = {
+						CreatedOnToolsVersion = 6.3;
+					};
+				};
+			};
+			buildConfigurationList = D05BCDC61AAD77EC0079C258 /* Build configuration list for PBXProject "WFNotificationCenter" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = D05BCDC21AAD77EC0079C258;
+			productRefGroup = D05BCDCC1AAD77EC0079C258 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D05BCDCA1AAD77EC0079C258 /* WFNotificationCenter */,
+				D05BCDD51AAD77EC0079C258 /* WFNotificationCenterTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D05BCDD41AAD77EC0079C258 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D05BCDC71AAD77EC0079C258 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D05BCDE71AAD78200079C258 /* WFDistributedNotificationCenter.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D05BCDD21AAD77EC0079C258 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D05BCDEF1AAD7A300079C258 /* WFNotificationCenterTests.m in Sources */,
+				D05BCDEA1AAD78BB0079C258 /* fishhook.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D05BCDD91AAD77EC0079C258 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D05BCDCA1AAD77EC0079C258 /* WFNotificationCenter */;
+			targetProxy = D05BCDD81AAD77EC0079C258 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		D05BCDDD1AAD77EC0079C258 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		D05BCDDE1AAD77EC0079C258 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		D05BCDE01AAD77EC0079C258 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		D05BCDE11AAD77EC0079C258 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		D05BCDE31AAD77EC0079C258 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = WFNotificationCenterTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		D05BCDE41AAD77EC0079C258 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = WFNotificationCenterTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D05BCDC61AAD77EC0079C258 /* Build configuration list for PBXProject "WFNotificationCenter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D05BCDDD1AAD77EC0079C258 /* Debug */,
+				D05BCDDE1AAD77EC0079C258 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D05BCDDF1AAD77EC0079C258 /* Build configuration list for PBXNativeTarget "WFNotificationCenter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D05BCDE01AAD77EC0079C258 /* Debug */,
+				D05BCDE11AAD77EC0079C258 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		D05BCDE21AAD77EC0079C258 /* Build configuration list for PBXNativeTarget "WFNotificationCenterTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D05BCDE31AAD77EC0079C258 /* Debug */,
+				D05BCDE41AAD77EC0079C258 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D05BCDC31AAD77EC0079C258 /* Project object */;
+}

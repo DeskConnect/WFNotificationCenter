@@ -1,0 +1,3 @@
+[submodule "WFNotificationCenter/fishhook"]
+	path = WFNotificationCenter/fishhook
+	url = git://github.com/facebook/fishhook.git
