@@ -1,6 +1,8 @@
 # WFNotificationCenter
 
-`WFDistributedNotificationCenter` is similar to `NSDistributedNotificationCenter` in functionality, but it is architected slightly differently to work within app groups on iOS.
+`WFDistributedNotificationCenter` is similar to `NSDistributedNotificationCenter`, but it is designed to work within app groups on iOS. This means that you can post notifications from your app to your extensions and vice versa.
+
+## Architecture
 
 The traditional model for distributed notifications is client-server, where applications are the clients and a daemon (`distnoted`, `notifyd`, etc) acts as the server. The server receives notifications from its clients and distributes them appropriately
 
