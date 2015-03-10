@@ -13,6 +13,7 @@ This model doesn't work on iOS. There isn't a daemon that supports posting rich 
 - **This is not production ready yet**
 - It works
 - It handles process suspension gracefully (and delivers notifications upon resume)
+- Test coverage is low
 - The central coordination mechanism can be improved a ton (named semaphores and shared memory aren't as clean as I had hoped)
 - The over-the-wire data format is not set in stone
 - The class interface is not set in stone
