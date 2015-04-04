@@ -12,13 +12,13 @@
 
 - (instancetype)initWithSecurityApplicationGroupIdentifier:(NSString *)groupIdentifier NS_DESIGNATED_INITIALIZER;
 
-- (void)addObserver:(id)observer selector:(SEL)aSelector name:(NSString *)aName;
+- (void)addObserver:(id)observer selector:(SEL)aSelector name:(NSString *)aName object:(NSString *)anObject;
 
 - (void)postNotification:(NSNotification *)notification;
-- (void)postNotificationName:(NSString *)aName;
-- (void)postNotificationName:(NSString *)aName userInfo:(NSDictionary *)aUserInfo;
+- (void)postNotificationName:(NSString *)aName object:(NSString *)anObject;
+- (void)postNotificationName:(NSString *)aName object:(NSString *)anObject userInfo:(NSDictionary *)aUserInfo;
 
 - (void)removeObserver:(id)observer;
-- (void)removeObserver:(id)observer name:(NSString *)aName;
+- (void)removeObserver:(id)observer name:(NSString *)aName object:(id)anObject;
 
 @end

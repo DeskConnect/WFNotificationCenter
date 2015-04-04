@@ -9,8 +9,8 @@
 /* Begin PBXBuildFile section */
 		D05BCDD71AAD77EC0079C258 /* libWFNotificationCenter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D05BCDCB1AAD77EC0079C258 /* libWFNotificationCenter.a */; };
 		D05BCDE71AAD78200079C258 /* WFDistributedNotificationCenter.m in Sources */ = {isa = PBXBuildFile; fileRef = D05BCDE61AAD78200079C258 /* WFDistributedNotificationCenter.m */; };
-		D05BCDEA1AAD78BB0079C258 /* fishhook.c in Sources */ = {isa = PBXBuildFile; fileRef = D05BCDE81AAD78BB0079C258 /* fishhook.c */; };
 		D05BCDEF1AAD7A300079C258 /* WFNotificationCenterTests.m in Sources */ = {isa = PBXBuildFile; fileRef = D05BCDEE1AAD7A300079C258 /* WFNotificationCenterTests.m */; };
+		D08CD3511ACE7098005D0626 /* fishhook.c in Sources */ = {isa = PBXBuildFile; fileRef = D08CD34F1ACE7098005D0626 /* fishhook.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,9 +41,9 @@
 		D05BCDDC1AAD77EC0079C258 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D05BCDE51AAD78200079C258 /* WFDistributedNotificationCenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WFDistributedNotificationCenter.h; sourceTree = "<group>"; };
 		D05BCDE61AAD78200079C258 /* WFDistributedNotificationCenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WFDistributedNotificationCenter.m; sourceTree = "<group>"; };
-		D05BCDE81AAD78BB0079C258 /* fishhook.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = fishhook.c; path = WFNotificationCenter/fishhook/fishhook.c; sourceTree = SOURCE_ROOT; };
-		D05BCDE91AAD78BB0079C258 /* fishhook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fishhook.h; path = WFNotificationCenter/fishhook/fishhook.h; sourceTree = SOURCE_ROOT; };
 		D05BCDEE1AAD7A300079C258 /* WFNotificationCenterTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WFNotificationCenterTests.m; sourceTree = "<group>"; };
+		D08CD34F1ACE7098005D0626 /* fishhook.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fishhook.c; sourceTree = "<group>"; };
+		D08CD3501ACE7098005D0626 /* fishhook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fishhook.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,10 +113,10 @@
 		D05BCDEB1AAD78C40079C258 /* fishhook */ = {
 			isa = PBXGroup;
 			children = (
-				D05BCDE91AAD78BB0079C258 /* fishhook.h */,
-				D05BCDE81AAD78BB0079C258 /* fishhook.c */,
+				D08CD34F1ACE7098005D0626 /* fishhook.c */,
+				D08CD3501ACE7098005D0626 /* fishhook.h */,
 			);
-			name = fishhook;
+			path = fishhook;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -216,7 +216,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D05BCDEF1AAD7A300079C258 /* WFNotificationCenterTests.m in Sources */,
-				D05BCDEA1AAD78BB0079C258 /* fishhook.c in Sources */,
+				D08CD3511ACE7098005D0626 /* fishhook.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -367,6 +367,7 @@
 				D05BCDE11AAD77EC0079C258 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		D05BCDE21AAD77EC0079C258 /* Build configuration list for PBXNativeTarget "WFNotificationCenterTests" */ = {
 			isa = XCConfigurationList;
@@ -375,6 +376,7 @@
 				D05BCDE41AAD77EC0079C258 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

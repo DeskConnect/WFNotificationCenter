@@ -10,14 +10,11 @@ This model doesn't work on iOS. There isn't a daemon that supports posting rich 
 
 ## Notes
 
-- **This is not production ready yet**
-- It works
+- **This is not production ready quite yet**
+- This is not meant for cross-app usage (it is not designed to be runtime compatible across versions)
 - It handles process suspension gracefully (and delivers notifications upon resume)
-- Test coverage is low
-- The central coordination mechanism can be improved a ton (named semaphores and shared memory aren't as clean as I had hoped)
-- The over-the-wire data format is not set in stone
-- The class interface is not set in stone
-- The `object` property on `NSNotification` is unused, but may be implemented in the future (with the requirement that it be an `NSString` like with `NSDistributedNotificationCenter`)
+- Test coverage is getting there
+- The central coordination mechanism needs improvements (named semaphores have serious issues)
 
 ## License
 
