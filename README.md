@@ -14,7 +14,6 @@ This model doesn't work on iOS. There isn't a daemon that supports posting rich 
 - This is not meant for cross-app usage (it is not designed to be runtime compatible across versions)
 - It handles process suspension gracefully (and delivers notifications upon resume)
 - Test coverage is getting there
-- The central coordination mechanism needs improvements (named semaphores have serious issues)
 
 ## License
 

@@ -8,9 +8,9 @@
 
 #import "WFDistributedNotificationCenter.h"
 
-#include <sys/mman.h>
-#include <sys/stat.h>
-#include <semaphore.h>
+#if defined(NS_BLOCK_ASSERTIONS)
+#warning This file should be compiled with assertions enabled
+#endif
 
 #pragma mark - Serialization
 
@@ -20,7 +20,7 @@ static NSString * const WFNotificationArchiveObjectKey = @"WFNotificationObject"
 
 static NSData *WFArchivedDataFromNotification(NSNotification *notification) {
     NSCAssert(notification.object == nil || [notification.object isKindOfClass:[NSString class]], @"Notification object must be of class NSString");
-    NSCAssert(notification.userInfo == nil || [NSPropertyListSerialization propertyList:notification.userInfo isValidForFormat:NSPropertyListBinaryFormat_v1_0], @"Notification userInfo object must be a valid property list");
+    NSCAssert(notification.userInfo == nil || [NSPropertyListSerialization propertyList:notification.userInfo isValidForFormat:NSPropertyListBinaryFormat_v1_0], @"Notification userInfo object must be a valid property list object");
     NSMutableData *data = [NSMutableData new];
     NSKeyedArchiver *archiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:data];
     [archiver setOutputFormat:NSPropertyListBinaryFormat_v1_0];
@@ -48,10 +48,9 @@ static NSNotification *WFNotificationFromArchivedData(NSData *data) {
 @end
 
 CFDataRef WFNotificationServerCallback(CFMessagePortRef local, SInt32 msgid, CFDataRef dataRef, void *info) {
-    NSData *data = CFBridgingRelease(dataRef);
-    for (WFDistributedNotificationCenter *center in (__bridge NSHashTable *)info) {
+    NSData *data = (dataRef ? [NSData dataWithBytes:CFDataGetBytePtr(dataRef) length:CFDataGetLength(dataRef)] : nil);
+    for (WFDistributedNotificationCenter *center in (__bridge NSHashTable *)info)
         [center receivedData:data withMessageId:msgid fromPort:local];
-    }
     return NULL;
 }
 
@@ -59,11 +58,9 @@ static SInt32 const WFDistributedNotificationPostMessageId = 1;
 static NSString * const WFDistributedNotificationCatchAllKey = @"*";
 
 @implementation WFDistributedNotificationCenter {
-    NSString *_memoryName;
-    NSString *_semaphoreName;
+    NSURL *_registryURL;
+    NSFileHandle *_registryHandle;
     NSString *_serverName;
-    int _fd;
-    sem_t *_semaphore;
     
     NSMutableDictionary *_observers;
     
@@ -126,118 +123,98 @@ static NSString * const WFDistributedNotificationCatchAllKey = @"*";
         return nil;
     }
     
-    _memoryName = _semaphoreName = [groupIdentifier stringByAppendingFormat:@"/wfdnc"];
+    _registryURL = [[[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:groupIdentifier] URLByAppendingPathComponent:@".WFDNCRegistry"];
+    if (!_registryURL) {
+        NSLog(@"%@: Warning: Could not get container URL for group identifier \"%@\", falling back to temporary directory.", self, groupIdentifier);
+        _registryURL = [[NSURL fileURLWithPath:NSTemporaryDirectory()] URLByAppendingPathComponent:@".WFDNCRegistry"];
+    }
     _serverName = [groupIdentifier stringByAppendingFormat:@".%@.%i", NSStringFromClass([self class]), getpid()];
     _observers = [NSMutableDictionary new];
     
-    if ((_fd = shm_open([_memoryName UTF8String], O_RDWR | O_CREAT, 0644)) == -1) {
-        NSLog(@"%@: Error opening shared memory segment with name \"%@\": %@", self, _memoryName, [[NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:nil] localizedFailureReason]);
+    int registryFd;
+    if ((registryFd = open([_registryURL.path UTF8String], O_RDWR | O_CREAT, 0644)) == -1) {
+        NSLog(@"%@: Error: Could not open registry file at path \"%@\": %@", self, _registryURL.path, [[NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:nil] localizedFailureReason]);
         return nil;
     }
     
-    if ((_semaphore = sem_open([_semaphoreName UTF8String], O_CREAT, 0644, 1)) == SEM_FAILED) {
-        NSLog(@"%@: Error opening named semaphore with name \"%@\": %@", self, _semaphoreName, [[NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:nil] localizedFailureReason]);
-        return nil;
-    }
+    _registryHandle = [[NSFileHandle alloc] initWithFileDescriptor:registryFd closeOnDealloc:YES];
     
     return self;
 }
 
 - (void)dealloc {
     if (_server) {
-        NSHashTable *activeCenters = [WFDistributedNotificationCenter activeCentersForServerName:_serverName];
-        if ([activeCenters containsObject:self] && activeCenters.count == 1) {
+        if (![[WFDistributedNotificationCenter activeCentersForServerName:_serverName] anyObject])
             CFMessagePortInvalidate(_server);
-        }
         CFRelease(_server);
-        [activeCenters removeObject:self];
     }
-    close(_fd);
-    shm_unlink([_memoryName UTF8String]);
-    sem_close(_semaphore);
-    sem_unlink([_semaphoreName UTF8String]);
 }
 
 #pragma mark - Port Registry
 
 - (NSDictionary *)portRegistry {
-    NSDictionary *portRegistry = nil;
-    
-    sem_wait(_semaphore);
-    struct stat shm_stat;
-    fstat(_fd, &shm_stat);
-    if (shm_stat.st_size > 0) {
-        void *bytes = mmap(NULL, shm_stat.st_size, PROT_READ, (MAP_FILE | MAP_SHARED), _fd, 0);
-        NSData *readData = [NSData dataWithBytesNoCopy:bytes length:MIN(strlen(bytes), shm_stat.st_size) freeWhenDone:NO];
-        portRegistry = [NSJSONSerialization JSONObjectWithData:readData options:0 error:nil];
-        readData = nil;
-        munmap(bytes, shm_stat.st_size);
+    if (flock(_registryHandle.fileDescriptor, LOCK_SH) == -1) {
+        NSLog(@"%@: Error: Failed to acquire registry lock: %@", self, [[NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:nil] localizedFailureReason]);
+        return nil;
     }
-    sem_post(_semaphore);
     
+    [_registryHandle seekToFileOffset:0];
+    NSDictionary *portRegistry = [NSPropertyListSerialization propertyListWithData:[_registryHandle readDataToEndOfFile] options:0 format:NULL error:nil];
+    flock(_registryHandle.fileDescriptor, LOCK_UN);
     return portRegistry;
 }
 
-- (void)mutatePortRegistry:(void (^)(NSMutableDictionary *portRegistry))mutator {
-    if (!mutator)
-        return;
-    
-    sem_wait(_semaphore);
-    NSMutableDictionary *portRegistry = [NSMutableDictionary new];
-    
-    struct stat shm_stat;
-    fstat(_fd, &shm_stat);
-    if (shm_stat.st_size > 0) {
-        void *bytes = mmap(NULL, shm_stat.st_size, PROT_READ, (MAP_FILE | MAP_SHARED), _fd, 0);
-        NSData *readData = [NSData dataWithBytesNoCopy:bytes length:MIN(strlen(bytes), shm_stat.st_size) freeWhenDone:NO];
-        [portRegistry addEntriesFromDictionary:[NSJSONSerialization JSONObjectWithData:readData options:NSJSONReadingMutableContainers error:nil]];
-        readData = nil;
-        munmap(bytes, shm_stat.st_size);
-    }
-    
-    mutator(portRegistry);
-    
-    NSData *writeData = (portRegistry.count ? [NSJSONSerialization dataWithJSONObject:portRegistry options:0 error:nil] : nil);
-    ftruncate(_fd, writeData.length);
-    fstat(_fd, &shm_stat);
-    if (writeData.length) {
-        void *bytes = mmap(NULL, shm_stat.st_size, (PROT_READ | PROT_WRITE), (MAP_FILE | MAP_SHARED), _fd, 0);
-        memset(bytes, 0, shm_stat.st_size);
-        memcpy(bytes, writeData.bytes, writeData.length);
-        munmap(bytes, shm_stat.st_size);
-    }
-    sem_post(_semaphore);
-}
-
 - (void)removePortsFromRegistry:(NSSet *)portNames forNotificationName:(NSString *)aName object:(NSString *)anObject {
-    [self mutatePortRegistry:^(NSMutableDictionary *portRegistry) {
-        for (NSString *observerName in [portRegistry allKeys]) {
-            if (!aName || [observerName isEqualToString:aName]) {
-                NSMutableDictionary *portsByObject = [portRegistry objectForKey:observerName];
-                for (NSString *observerObject in [portsByObject allKeys]) {
-                    NSMutableSet *ports = [portsByObject objectForKey:observerObject];
-                    if (!anObject || [observerObject isEqualToString:anObject]) {
-                        for (NSString *portName in portNames)
-                            [ports removeObject:portName];
-                    }
-                    if (!ports.count)
-                        [portsByObject removeObjectForKey:observerObject];
+    if (flock(_registryHandle.fileDescriptor, LOCK_EX) == -1) {
+        NSLog(@"%@: Error: Failed to acquire registry lock: %@", self, [[NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:nil] localizedFailureReason]);
+        return;
+    }
+    
+    [_registryHandle seekToFileOffset:0];
+    NSMutableDictionary *portRegistry = [NSPropertyListSerialization propertyListFromData:[_registryHandle readDataToEndOfFile] mutabilityOption:NSPropertyListMutableContainers format:NULL errorDescription:nil];
+    for (NSString *observerName in [portRegistry allKeys]) {
+        if (!aName || [observerName isEqualToString:aName]) {
+            NSMutableDictionary *portsByObject = [portRegistry objectForKey:observerName];
+            for (NSString *observerObject in [portsByObject allKeys]) {
+                NSMutableSet *ports = [portsByObject objectForKey:observerObject];
+                if (!anObject || [observerObject isEqualToString:anObject]) {
+                    for (NSString *portName in portNames)
+                        [ports removeObject:portName];
                 }
-                if (!portsByObject.count)
-                    [portRegistry removeObjectForKey:observerName];
+                if (!ports.count)
+                    [portsByObject removeObjectForKey:observerObject];
             }
+            if (!portsByObject.count)
+                [portRegistry removeObjectForKey:observerName];
         }
-    }];
+    }
+    
+    NSData *data = [NSPropertyListSerialization dataFromPropertyList:portRegistry format:NSPropertyListBinaryFormat_v1_0 errorDescription:nil];
+    [_registryHandle truncateFileAtOffset:data.length];
+    [_registryHandle seekToFileOffset:0];
+    [_registryHandle writeData:data];
+    flock(_registryHandle.fileDescriptor, LOCK_UN);
 }
 
 - (void)addPortsToRegistry:(NSSet *)portNames forNotificationName:(NSString *)aName object:(NSString *)anObject {
-    [self mutatePortRegistry:^(NSMutableDictionary *portRegistry) {
-        NSMutableDictionary *portsByObject = ([portRegistry objectForKey:(aName ?: WFDistributedNotificationCatchAllKey)] ?: [NSMutableDictionary new]);
-        NSMutableSet *ports = ([NSMutableSet setWithArray:[portsByObject objectForKey:(anObject ?: WFDistributedNotificationCatchAllKey)]] ?: [NSMutableSet new]);
-        [ports addObject:_serverName];
-        [portsByObject setObject:[ports allObjects] forKey:(anObject ?: WFDistributedNotificationCatchAllKey)];
-        [portRegistry setObject:portsByObject forKey:(aName ?: WFDistributedNotificationCatchAllKey)];
-    }];
+    if (flock(_registryHandle.fileDescriptor, LOCK_EX) == -1) {
+        NSLog(@"%@: Error: Failed to acquire registry lock: %@", self, [[NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:nil] localizedFailureReason]);
+        return;
+    }
+    
+    [_registryHandle seekToFileOffset:0];
+    NSMutableDictionary *portRegistry = ([NSPropertyListSerialization propertyListFromData:[_registryHandle readDataToEndOfFile] mutabilityOption:NSPropertyListMutableContainers format:NULL errorDescription:nil] ?: [NSMutableDictionary new]);
+    NSMutableDictionary *portsByObject = ([portRegistry objectForKey:(aName ?: WFDistributedNotificationCatchAllKey)] ?: [NSMutableDictionary new]);
+    NSMutableSet *ports = ([NSMutableSet setWithArray:[portsByObject objectForKey:(anObject ?: WFDistributedNotificationCatchAllKey)]] ?: [NSMutableSet new]);
+    [ports addObject:_serverName];
+    [portsByObject setObject:[ports allObjects] forKey:(anObject ?: WFDistributedNotificationCatchAllKey)];
+    [portRegistry setObject:portsByObject forKey:(aName ?: WFDistributedNotificationCatchAllKey)];
+    
+    NSData *data = [NSPropertyListSerialization dataFromPropertyList:portRegistry format:NSPropertyListBinaryFormat_v1_0 errorDescription:nil];
+    [_registryHandle truncateFileAtOffset:data.length];
+    [_registryHandle seekToFileOffset:0];
+    [_registryHandle writeData:data];
+    flock(_registryHandle.fileDescriptor, LOCK_UN);
 }
 
 #pragma mark - Registration
@@ -346,7 +323,7 @@ static NSString * const WFDistributedNotificationCatchAllKey = @"*";
     NSMutableSet *invalidPortNames = [NSMutableSet new];
     
     for (NSString *portName in portNames) {
-        CFMessagePortRef port =  CFMessagePortCreateRemote(NULL, (__bridge CFStringRef)portName);
+        CFMessagePortRef port = CFMessagePortCreateRemote(NULL, (__bridge CFStringRef)portName);
         if (!port || !CFMessagePortIsValid(port)) {
             [invalidPortNames addObject:portName];
             continue;

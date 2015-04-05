@@ -57,7 +57,9 @@ static NSString * const WFSecondTestObject = @"Object2";
 
 - (void)setUp {
     [super setUp];
+    [self willChangeValueForKey:NSStringFromSelector(@selector(lastNotification))];
     self.notifications = [NSMutableArray new];
+    [self didChangeValueForKey:NSStringFromSelector(@selector(lastNotification))];
     self.center = [[WFDistributedNotificationCenter alloc] initWithSecurityApplicationGroupIdentifier:WFNotificationCenterTestAppGroup];
 }
 
