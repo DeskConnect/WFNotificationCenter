@@ -168,6 +168,18 @@ static NSString * const WFSecondTestObject = @"Object2";
     XCTAssertEqualObjects(self.lastNotification.object, WFTestObject);
 }
 
+- (void)testAddingBlockObserver {
+    __weak __typeof__(self) weakSelf = self;
+    XCTestExpectation *expectation = [self expectationWithDescription:nil];
+    [self.center addObserverForName:WFTestNotificationName object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *note) {
+        [weakSelf.notifications addObject:note];
+        [expectation fulfill];
+    }];
+    [self.center postNotificationName:WFTestNotificationName object:nil];
+    [self waitForExpectationsWithTimeout:0.5f handler:nil];
+    XCTAssertEqualObjects(self.lastNotification.name, WFTestNotificationName);
+}
+
 - (void)testRemovingObserver {
     [self.center addObserver:self selector:@selector(receive:) name:WFTestNotificationName object:nil];
     [self.center addObserver:self selector:@selector(receive:) name:WFSecondTestNotificationName object:nil];
@@ -229,6 +241,19 @@ static NSString * const WFSecondTestObject = @"Object2";
     [self waitForExpectationsWithTimeout:0.5f handler:nil];
     XCTAssertEqualObjects(self.lastNotification.name, WFSecondTestNotificationName);
     XCTAssertEqualObjects(self.lastNotification.object, WFSecondTestObject);
+}
+
+- (void)testRemovingBlockObserver {
+    __weak __typeof__(self) weakSelf = self;
+    __weak id observer = [self.center addObserverForName:WFTestNotificationName object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *note) {
+        [weakSelf.notifications addObject:note];
+    }];
+    XCTAssertNotNil(observer);
+    
+    [self.center removeObserver:observer];
+    [self.center postNotificationName:WFTestNotificationName object:nil];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5f]];
+    XCTAssertNil(self.lastNotification);
 }
 
 #pragma mark - Multiple Centers

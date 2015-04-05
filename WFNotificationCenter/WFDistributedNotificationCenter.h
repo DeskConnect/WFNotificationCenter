@@ -13,6 +13,7 @@
 - (instancetype)initWithSecurityApplicationGroupIdentifier:(NSString *)groupIdentifier NS_DESIGNATED_INITIALIZER;
 
 - (void)addObserver:(id)observer selector:(SEL)aSelector name:(NSString *)aName object:(NSString *)anObject;
+- (id<NSObject>)addObserverForName:(NSString *)name object:(id)obj queue:(NSOperationQueue *)queue usingBlock:(void (^)(NSNotification *note))block;
 
 - (void)postNotification:(NSNotification *)notification;
 - (void)postNotificationName:(NSString *)aName object:(NSString *)anObject;

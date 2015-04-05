@@ -54,6 +54,42 @@ CFDataRef WFNotificationServerCallback(CFMessagePortRef local, SInt32 msgid, CFD
     return NULL;
 }
 
+#pragma mark - Block Observer
+
+@interface WFDNCBlockObserver : NSObject
+
+@end
+
+@implementation WFDNCBlockObserver {
+    NSOperationQueue *_queue;
+    void (^_block)(NSNotification *);
+}
+
+- (instancetype)initWithBlock:(void (^)(NSNotification *))block queue:(NSOperationQueue *)queue {
+    NSParameterAssert(block);
+    self = [super init];
+    if (!self) {
+        return nil;
+    }
+    
+    _block = [block copy];
+    _queue = queue;
+    
+    return self;
+}
+
+- (void)send:(NSNotification *)notification {
+    if (_queue) {
+        [_queue addOperationWithBlock:^{
+            _block(notification);
+        }];
+    } else {
+        _block(notification);
+    }
+}
+
+@end
+
 static SInt32 const WFDistributedNotificationPostMessageId = 1;
 static NSString * const WFDistributedNotificationCatchAllKey = @"*";
 
@@ -63,6 +99,7 @@ static NSString * const WFDistributedNotificationCatchAllKey = @"*";
     NSString *_serverName;
     
     NSMutableDictionary *_observers;
+    NSMutableSet *_blockObservers;
     
     CFMessagePortRef _server;
 }
@@ -130,6 +167,7 @@ static NSString * const WFDistributedNotificationCatchAllKey = @"*";
     }
     _serverName = [groupIdentifier stringByAppendingFormat:@".wfdnc.%i", getpid()];
     _observers = [NSMutableDictionary new];
+    _blockObservers = [NSMutableSet new];
     
     int registryFd;
     if ((registryFd = open([_registryURL.path UTF8String], O_RDWR | O_CREAT, 0644)) == -1) {
@@ -227,6 +265,12 @@ static NSString * const WFDistributedNotificationCatchAllKey = @"*";
     if (!observer)
         return;
     
+    if ([_blockObservers containsObject:observer]) {
+        aName = nil;
+        anObject = nil;
+        [_blockObservers removeObject:observer];
+    }
+    
     for (NSString *notificationName in [_observers allKeys]) {
         NSMutableDictionary *targetsByObject = [_observers objectForKey:notificationName];
         if (!aName || [notificationName isEqualToString:aName]) {
@@ -279,6 +323,14 @@ static NSString * const WFDistributedNotificationCatchAllKey = @"*";
     }
     
     [self addPortsToRegistry:[NSSet setWithObject:_serverName] forNotificationName:aName object:anObject];
+}
+
+- (id<NSObject>)addObserverForName:(NSString *)name object:(id)obj queue:(NSOperationQueue *)queue usingBlock:(void (^)(NSNotification *note))block {
+    NSParameterAssert(block);
+    WFDNCBlockObserver *observer = [[WFDNCBlockObserver alloc] initWithBlock:block queue:queue];
+    [_blockObservers addObject:observer];
+    [self addObserver:observer selector:@selector(send:) name:name object:obj];
+    return observer;
 }
 
 #pragma mark - Posting
