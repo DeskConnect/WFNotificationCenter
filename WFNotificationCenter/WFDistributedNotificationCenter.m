@@ -128,7 +128,7 @@ static NSString * const WFDistributedNotificationCatchAllKey = @"*";
         NSLog(@"%@: Warning: Could not get container URL for group identifier \"%@\", falling back to temporary directory.", self, groupIdentifier);
         _registryURL = [[NSURL fileURLWithPath:NSTemporaryDirectory()] URLByAppendingPathComponent:@".WFDNCRegistry"];
     }
-    _serverName = [groupIdentifier stringByAppendingFormat:@".%@.%i", NSStringFromClass([self class]), getpid()];
+    _serverName = [groupIdentifier stringByAppendingFormat:@".wfdnc.%i", getpid()];
     _observers = [NSMutableDictionary new];
     
     int registryFd;
