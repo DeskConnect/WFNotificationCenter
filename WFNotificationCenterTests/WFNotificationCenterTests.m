@@ -86,11 +86,6 @@ static NSString * const WFSecondTestObject = @"Object2";
     XCTAssertThrowsSpecificNamed([self.center postNotification:notification], NSException, NSInternalInconsistencyException);
 }
 
-- (void)testInsecureCoding {
-    XCTAssertThrowsSpecificNamed([self.center postNotificationName:WFTestNotificationName object:nil userInfo:@{@"Bundle": [NSURL URLWithString:@"https://apple.com"]}], NSException, NSInternalInconsistencyException);
-    XCTAssertThrowsSpecificNamed([self.center postNotificationName:WFTestNotificationName object:nil userInfo:@{@"Bundle": [NSBundle mainBundle]}], NSException, NSInternalInconsistencyException);
-}
-
 - (void)testSecureCoding {
     [self.center addObserver:self selector:@selector(receive:) name:nil object:nil];
     NSNotification *notification = [NSNotification notificationWithName:WFTestNotificationName object:@"Foo" userInfo:@{@"Bar": @YES, @"Baz": @[@1,@2,@3]}];

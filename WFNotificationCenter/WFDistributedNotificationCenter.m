@@ -15,29 +15,40 @@
 #pragma mark - Serialization
 
 static NSString * const WFNotificationArchiveNameKey = @"WFNotificationName";
-static NSString * const WFNotificationArchiveUserInfoKey = @"WFNotificationUserInfo";
 static NSString * const WFNotificationArchiveObjectKey = @"WFNotificationObject";
+static NSString * const WFNotificationArchiveUserInfoKey = @"WFNotificationUserInfo";
 
 static NSData *WFArchivedDataFromNotification(NSNotification *notification) {
     NSCAssert(notification.object == nil || [notification.object isKindOfClass:[NSString class]], @"Notification object must be of class NSString");
-    NSCAssert(notification.userInfo == nil || [NSPropertyListSerialization propertyList:notification.userInfo isValidForFormat:NSPropertyListBinaryFormat_v1_0], @"Notification userInfo object must be a valid property list object");
     NSMutableData *data = [NSMutableData new];
     NSKeyedArchiver *archiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:data];
     [archiver setOutputFormat:NSPropertyListBinaryFormat_v1_0];
     [archiver setRequiresSecureCoding:YES];
     [archiver encodeObject:notification.name forKey:WFNotificationArchiveNameKey];
-    [archiver encodeObject:notification.userInfo forKey:WFNotificationArchiveUserInfoKey];
     [archiver encodeObject:notification.object forKey:WFNotificationArchiveObjectKey];
+    [archiver encodeObject:notification.userInfo forKey:WFNotificationArchiveUserInfoKey];
     [archiver finishEncoding];
     return [data copy];
 }
 
-static NSNotification *WFNotificationFromArchivedData(NSData *data) {
+static NSNotification *WFNotificationFromArchivedData(NSData *data, NSSet *allowedClasses) {
     NSKeyedUnarchiver *unarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:data];
     [unarchiver setRequiresSecureCoding:YES];
     NSString *name = [unarchiver decodeObjectOfClass:[NSString class] forKey:WFNotificationArchiveNameKey];
-    NSDictionary *userInfo = [unarchiver decodePropertyListForKey:WFNotificationArchiveUserInfoKey];
     NSString *object = [unarchiver decodeObjectOfClass:[NSString class] forKey:WFNotificationArchiveObjectKey];
+    NSDictionary *userInfo = nil;
+    if (allowedClasses) {
+        @try {
+            userInfo = [unarchiver decodeObjectOfClasses:[allowedClasses setByAddingObject:[NSDictionary class]] forKey:WFNotificationArchiveUserInfoKey];
+        }
+        @catch (NSException *exception) {
+            if ([exception.name isEqualToString:NSInvalidUnarchiveOperationException]) {
+                NSLog(@"%@: Error: invalid set of allowed classes for \"%@\", dropping userInfo dictionary", NSStringFromClass([WFDistributedNotificationCenter class]), name);
+            } else {
+                @throw;
+            }
+        }
+    }
     return [NSNotification notificationWithName:name object:object userInfo:userInfo];
 }
 
@@ -302,13 +313,21 @@ static NSString * const WFDistributedNotificationCatchAllKey = @"*";
 }
 
 - (void)addObserver:(id)observer selector:(SEL)aSelector name:(NSString *)aName object:(NSString *)anObject {
+    [self addObserver:observer selector:aSelector name:aName object:anObject allowedClasses:nil];
+}
+
+- (void)addObserver:(id)observer selector:(SEL)aSelector name:(NSString *)aName object:(NSString *)anObject allowedClasses:(NSSet *)allowedClasses {
     if (!observer || !aSelector)
         return;
+    
+    if (!allowedClasses.count) {
+        allowedClasses = [NSSet setWithObjects:[NSArray class], [NSDictionary class], [NSString class], [NSData class], [NSDate class], [NSNumber class], nil];
+    }
     
     NSMutableDictionary *targetsByObject = ([_observers objectForKey:(aName ?: WFDistributedNotificationCatchAllKey)] ?: [NSMutableDictionary new]);
     NSMapTable *selectorsByTarget = ([targetsByObject objectForKey:(anObject ?: WFDistributedNotificationCatchAllKey)] ?: [NSMapTable weakToStrongObjectsMapTable]);
     NSMutableSet *selectors = ([selectorsByTarget objectForKey:observer] ?: [NSMutableSet new]);
-    [selectors addObject:NSStringFromSelector(aSelector)];
+    [selectors addObject:@[NSStringFromSelector(aSelector), allowedClasses]];
     [selectorsByTarget setObject:selectors forKey:observer];
     [targetsByObject setObject:selectorsByTarget forKey:(anObject ?: WFDistributedNotificationCatchAllKey)];
     [_observers setObject:targetsByObject forKey:(aName ?: WFDistributedNotificationCatchAllKey)];
@@ -326,10 +345,14 @@ static NSString * const WFDistributedNotificationCatchAllKey = @"*";
 }
 
 - (id<NSObject>)addObserverForName:(NSString *)name object:(id)obj queue:(NSOperationQueue *)queue usingBlock:(void (^)(NSNotification *note))block {
+    return [self addObserverForName:name object:obj allowedClasses:nil queue:queue usingBlock:block];
+}
+
+- (id<NSObject>)addObserverForName:(NSString *)name object:(id)obj allowedClasses:(NSSet *)allowedClasses queue:(NSOperationQueue *)queue usingBlock:(void (^)(NSNotification *note))block {
     NSParameterAssert(block);
     WFDNCBlockObserver *observer = [[WFDNCBlockObserver alloc] initWithBlock:block queue:queue];
     [_blockObservers addObject:observer];
-    [self addObserver:observer selector:@selector(send:) name:name object:obj];
+    [self addObserver:observer selector:@selector(send:) name:name object:obj allowedClasses:allowedClasses];
     return observer;
 }
 
@@ -397,14 +420,14 @@ static NSString * const WFDistributedNotificationCatchAllKey = @"*";
 
 - (void)receivedData:(NSData *)data withMessageId:(SInt32)messageId fromPort:(CFMessagePortRef)port {
     if (messageId == WFDistributedNotificationPostMessageId) {
-        [self receivedNotification:WFNotificationFromArchivedData(data)];
+        [self receivedNotificationData:data];
     }
 }
 
-- (void)receivedNotification:(NSNotification *)notification {
+- (void)receivedNotificationData:(NSData *)data {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
-    NSAssert(notification.object == nil || [notification.object isKindOfClass:[NSString class]], @"%@: Notification object must be of class NSString", self);
+    NSNotification *notification = WFNotificationFromArchivedData(data, nil);
     for (NSString *observerNotificationName in _observers) {
         if ([observerNotificationName isEqualToString:notification.name] || [observerNotificationName isEqualToString:WFDistributedNotificationCatchAllKey]) {
             NSMutableDictionary *observerTargetsByObject = [_observers objectForKey:observerNotificationName];
@@ -412,8 +435,9 @@ static NSString * const WFDistributedNotificationCatchAllKey = @"*";
                 if ([notification.object isEqualToString:observerObject] || [observerObject isEqualToString:WFDistributedNotificationCatchAllKey]) {
                     NSMapTable *selectorsByTarget = [observerTargetsByObject objectForKey:observerObject];
                     for (id target in selectorsByTarget) {
-                        for (NSString *selectorString in [selectorsByTarget objectForKey:target]) {
-                            [target performSelector:NSSelectorFromString(selectorString) withObject:notification];
+                        for (NSArray *selectorPair in [selectorsByTarget objectForKey:target]) {
+                            notification = WFNotificationFromArchivedData(data, [selectorPair objectAtIndex:1]);
+                            [target performSelector:NSSelectorFromString([selectorPair objectAtIndex:0]) withObject:notification];
                         }
                     }
                 }

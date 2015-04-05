@@ -13,7 +13,9 @@
 - (instancetype)initWithSecurityApplicationGroupIdentifier:(NSString *)groupIdentifier NS_DESIGNATED_INITIALIZER;
 
 - (void)addObserver:(id)observer selector:(SEL)aSelector name:(NSString *)aName object:(NSString *)anObject;
+- (void)addObserver:(id)observer selector:(SEL)aSelector name:(NSString *)aName object:(NSString *)anObject allowedClasses:(NSSet *)allowedClasses;
 - (id<NSObject>)addObserverForName:(NSString *)name object:(id)obj queue:(NSOperationQueue *)queue usingBlock:(void (^)(NSNotification *note))block;
+- (id<NSObject>)addObserverForName:(NSString *)name object:(id)obj allowedClasses:(NSSet *)allowedClasses queue:(NSOperationQueue *)queue usingBlock:(void (^)(NSNotification *note))block;
 
 - (void)postNotification:(NSNotification *)notification;
 - (void)postNotificationName:(NSString *)aName object:(NSString *)anObject;
