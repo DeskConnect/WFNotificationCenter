@@ -1,16 +1,12 @@
 //
 //  WFDistributedNotificationCenter.m
-//  WorkflowKit
+//  WFNotificationCenter
 //
 //  Created by Conrad Kramer on 3/5/15.
-//  Copyright (c) 2015 DeskConnect. All rights reserved.
+//  Copyright (c) 2015 DeskConnect, Inc. All rights reserved.
 //
 
 #import "WFDistributedNotificationCenter.h"
-
-#if defined(NS_BLOCK_ASSERTIONS)
-#warning This file should be compiled with assertions enabled
-#endif
 
 #pragma mark - Serialization
 
