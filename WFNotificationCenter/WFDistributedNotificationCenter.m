@@ -317,8 +317,8 @@ static NSString * const WFDistributedNotificationCatchAllKey = @"*";
 }
 
 - (void)addObserver:(id)observer selector:(SEL)aSelector name:(NSString *)aName object:(NSString *)anObject allowedClasses:(NSSet *)allowedClasses {
-    if (!observer || !aSelector)
-        return;
+    NSParameterAssert(observer);
+    NSParameterAssert(aSelector);
     
     if (!allowedClasses.count) {
         allowedClasses = [NSSet setWithObjects:[NSArray class], [NSDictionary class], [NSString class], [NSData class], [NSDate class], [NSNumber class], nil];
@@ -367,6 +367,7 @@ static NSString * const WFDistributedNotificationCatchAllKey = @"*";
 }
 
 - (void)postNotification:(NSNotification *)notification {
+    NSParameterAssert(notification);
     NSAssert(notification.object == nil || [notification.object isKindOfClass:[NSString class]], @"%@: Notification object must be of class NSString", self);
     NSData *data = WFArchivedDataFromNotification(notification);
     
