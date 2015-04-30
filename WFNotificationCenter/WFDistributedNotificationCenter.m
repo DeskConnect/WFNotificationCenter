@@ -406,7 +406,7 @@ static NSString * const WFDistributedNotificationCatchAllKey = @"*";
         
         SInt32 status = CFMessagePortSendRequest(port, WFDistributedNotificationPostMessageId, (__bridge CFDataRef)data, 1000, 0, NULL, NULL);
         if (status != kCFMessagePortSuccess) {
-            NSLog(@"%@: Error: could not post notification to port \"%@\" with error code %i", self, portName, status);
+            NSLog(@"%@: Error: could not post notification to port \"%@\" with error code %i", self, portName, (int)status);
         }
         
         CFMessagePortInvalidate(port);
