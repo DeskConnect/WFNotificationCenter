@@ -216,7 +216,7 @@ static NSString * const WFDistributedNotificationCatchAllKey = @"*";
     }
     
     [_registryHandle seekToFileOffset:0];
-    NSMutableDictionary *portRegistry = [NSPropertyListSerialization propertyListFromData:[_registryHandle readDataToEndOfFile] mutabilityOption:NSPropertyListMutableContainers format:NULL errorDescription:nil];
+    NSMutableDictionary *portRegistry = [NSPropertyListSerialization propertyListWithData:[_registryHandle readDataToEndOfFile] options:NSPropertyListMutableContainers format:NULL error:nil];
     for (NSString *observerName in [portRegistry allKeys]) {
         if (!aName || [observerName isEqualToString:aName]) {
             NSMutableDictionary *portsByObject = [portRegistry objectForKey:observerName];
@@ -234,7 +234,7 @@ static NSString * const WFDistributedNotificationCatchAllKey = @"*";
         }
     }
     
-    NSData *data = [NSPropertyListSerialization dataFromPropertyList:portRegistry format:NSPropertyListBinaryFormat_v1_0 errorDescription:nil];
+    NSData *data = [NSPropertyListSerialization dataWithPropertyList:portRegistry format:NSPropertyListBinaryFormat_v1_0 options:0 error:nil];
     [_registryHandle truncateFileAtOffset:data.length];
     [_registryHandle seekToFileOffset:0];
     [_registryHandle writeData:data];
@@ -248,14 +248,14 @@ static NSString * const WFDistributedNotificationCatchAllKey = @"*";
     }
     
     [_registryHandle seekToFileOffset:0];
-    NSMutableDictionary *portRegistry = ([NSPropertyListSerialization propertyListFromData:[_registryHandle readDataToEndOfFile] mutabilityOption:NSPropertyListMutableContainers format:NULL errorDescription:nil] ?: [NSMutableDictionary new]);
+    NSMutableDictionary *portRegistry = ([NSPropertyListSerialization propertyListWithData:[_registryHandle readDataToEndOfFile] options:NSPropertyListMutableContainers format:NULL error:nil] ?: [NSMutableDictionary new]);
     NSMutableDictionary *portsByObject = ([portRegistry objectForKey:(aName ?: WFDistributedNotificationCatchAllKey)] ?: [NSMutableDictionary new]);
     NSMutableSet *ports = ([NSMutableSet setWithArray:[portsByObject objectForKey:(anObject ?: WFDistributedNotificationCatchAllKey)]] ?: [NSMutableSet new]);
     [ports addObject:_serverName];
     [portsByObject setObject:[ports allObjects] forKey:(anObject ?: WFDistributedNotificationCatchAllKey)];
     [portRegistry setObject:portsByObject forKey:(aName ?: WFDistributedNotificationCatchAllKey)];
     
-    NSData *data = [NSPropertyListSerialization dataFromPropertyList:portRegistry format:NSPropertyListBinaryFormat_v1_0 errorDescription:nil];
+    NSData *data = [NSPropertyListSerialization dataWithPropertyList:portRegistry format:NSPropertyListBinaryFormat_v1_0 options:0 error:nil];
     [_registryHandle truncateFileAtOffset:data.length];
     [_registryHandle seekToFileOffset:0];
     [_registryHandle writeData:data];
