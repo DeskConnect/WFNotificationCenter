@@ -398,6 +398,8 @@ static NSString * const WFDistributedNotificationCatchAllKey = @"*";
         CFMessagePortRef port = CFMessagePortCreateRemote(NULL, (__bridge CFStringRef)portName);
         if (!port || !CFMessagePortIsValid(port)) {
             [invalidPortNames addObject:portName];
+            if (port)
+                CFRelease(port);
             continue;
         }
         
